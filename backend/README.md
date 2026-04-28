@@ -1,39 +1,52 @@
-# Meal Demand Prediction System
+# Backend Module
 
-Project structure for team development:
+Spring Boot backend for the Meal Demand Prediction System.
 
-## Folder Structure
+## Current Features Implemented
 
-meal-demand-prediction-system/
-│
-├── backend
-├── frontend
-├── model
+- Sales transaction API
+- Meal creation API
+- Ingredient creation API
+- Meal-ingredient mapping API
+- Inventory creation API
 
-## Module Responsibilities
+## Current APIs
 
-### backend
-Spring Boot backend for:
-- sales transaction APIs
-- meals, ingredients, recipe mapping
-- inventory management
-- future ML integration
+### POST /api/sales
+Stores meal sales transaction.
 
-### frontend
-React frontend for:
-- billing interface
-- prediction dashboard
-- inventory display
+### POST /api/meals
+Creates meal master data.
 
-### model
-Machine learning module for:
-- training on sales data
-- predicting weekly meal demand
+### POST /api/ingredients
+Creates ingredient master data.
 
-## Team Rule
+### POST /api/meal-ingredients
+Maps ingredients to meals.
 
-Each teammate should work only inside their assigned folder.
+### POST /api/inventory
+Stores center-wise ingredient stock.
 
-- backend → backend/
-- frontend → frontend/
-- model → model/
+## Current Database Tables
+
+- centers
+- meals
+- ingredients
+- meal_ingredients
+- inventory
+- sales_transactions
+
+## Current Backend Flow
+
+1. Sales transaction received
+2. Meal and center validated
+3. Price fetched from meal table
+4. Transaction saved in sales_transactions
+
+## Pending Work
+
+- weekly aggregation
+- ML integration
+- prediction API
+- ingredient demand calculation
+- shortage calculation
