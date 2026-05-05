@@ -30,11 +30,3 @@ React frontend for:
 Machine learning module for:
 - training on sales data
 - predicting weekly meal demand
-
-## Team Rule
-
-Each teammate should work only inside their assigned folder.
-
-- backend → backend/
-- frontend → frontend/
-- model → model/
