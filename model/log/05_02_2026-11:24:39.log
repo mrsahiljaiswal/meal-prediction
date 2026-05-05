@@ -1,0 +1,8 @@
+[ 2026-05-02 11:24:40,618 ] 13 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:24:40,638 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-02 11:24:40,653 ] 97 werkzeug - INFO -  * Debugger PIN: 142-471-330
+[ 2026-05-02 11:24:42,319 ] 39 root - INFO - Prediction dataset shape:(5, 9)
+[ 2026-05-02 11:24:42,319 ] 30 root - INFO - Starting prediction pipeline.
+[ 2026-05-02 11:24:42,500 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-02 11:24:42,950 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:24:42] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+[ 2026-05-02 11:26:27,487 ] 97 werkzeug - INFO -  * Detected change in '/Users/prince-khatri/Documents/Learning/Meals_prediction_model/src/pipelines/predict_pipeline.py', reloading

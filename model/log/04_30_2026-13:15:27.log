@@ -1,0 +1,11 @@
+[ 2026-04-30 13:15:28,611 ] 20 root - INFO - Starting data ingestion process.
+[ 2026-04-30 13:15:28,764 ] 25 root - INFO - Raw data loaded successfully from data/raw/data.csv. Shape: (456548, 9)
+[ 2026-04-30 13:15:29,559 ] 31 root - INFO - Latest reference data saved at: latest_data.csv
+[ 2026-04-30 13:15:29,583 ] 39 root - INFO - Data split at week 130. Train rows: 403985, Test rows: 52563
+[ 2026-04-30 13:15:30,414 ] 51 root - INFO - Ingested data saved to artifacts/train.csv and artifacts/test.csv
+[ 2026-04-30 13:15:30,416 ] 44 root - INFO - Starting data transformation.
+[ 2026-04-30 13:15:30,557 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-04-30 13:15:30,709 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-04-30 13:15:30,733 ] 65 root - INFO - Applying log transformation to target variable.
+[ 2026-04-30 13:15:30,842 ] 79 root - INFO - Transformed data saved at artifacts/transformed_data.pkl
+[ 2026-04-30 13:15:31,370 ] 41 root - INFO - Initializing models for training.

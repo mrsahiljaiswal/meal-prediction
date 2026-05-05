@@ -1,0 +1,16 @@
+[ 2026-05-02 11:12:32,317 ] 12 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:12:32,332 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-02 11:12:32,350 ] 97 werkzeug - INFO -  * Debugger PIN: 142-471-330
+[ 2026-05-02 11:12:34,906 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:12:34] "[33mGET / HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:12:38,328 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:12:38] "GET /predict HTTP/1.1" 200 -
+[ 2026-05-02 11:13:05,541 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:13:05] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:13:05,543 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:13:05] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:13:05,543 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:13:05] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:17:56,980 ] 52 root - ERROR - Error during API prediction: 415 Unsupported Media Type: Did not attempt to load JSON data because the request Content-Type was not 'application/json'.
+[ 2026-05-02 11:17:56,981 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:17:56] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+[ 2026-05-02 11:18:34,764 ] 30 root - INFO - Starting prediction pipeline.
+[ 2026-05-02 11:18:34,930 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-02 11:18:35,513 ] 63 root - ERROR - Prediction failed: Input data must be 2 dimensional and non empty.
+[ 2026-05-02 11:18:35,514 ] 52 root - ERROR - Error during API prediction: Input data must be 2 dimensional and non empty.
+[ 2026-05-02 11:18:35,514 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:18:35] "[35m[1mPOST /predict HTTP/1.1[0m" 500 -
+[ 2026-05-02 11:19:39,926 ] 97 werkzeug - INFO -  * Detected change in '/Users/prince-khatri/Documents/Learning/Meals_prediction_model/app.py', reloading

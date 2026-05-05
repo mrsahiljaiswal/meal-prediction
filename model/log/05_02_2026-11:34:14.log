@@ -1,0 +1,9 @@
+[ 2026-05-02 11:34:15,124 ] 13 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:34:15,161 ] 97 werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.171.133.64:5001
+[ 2026-05-02 11:34:15,161 ] 97 werkzeug - INFO - [33mPress CTRL+C to quit[0m
+[ 2026-05-02 11:34:15,162 ] 97 werkzeug - INFO -  * Restarting with stat
+[ 2026-05-02 11:35:13,021 ] 97 werkzeug - INFO -  * Restarting with stat
+[ 2026-05-02 11:35:23,965 ] 97 werkzeug - INFO -  * Restarting with stat

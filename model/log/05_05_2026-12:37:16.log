@@ -1,0 +1,8 @@
+[ 2026-05-05 12:37:17,406 ] 15 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-05 12:37:17,422 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-05 12:37:17,439 ] 97 werkzeug - INFO -  * Debugger PIN: 134-177-964
+[ 2026-05-05 12:37:39,200 ] 97 werkzeug - INFO - 10.171.133.64 - - [05/May/2026 12:37:39] "GET /predict HTTP/1.1" 200 -
+[ 2026-05-05 12:37:50,691 ] 97 werkzeug - INFO - 127.0.0.1 - - [05/May/2026 12:37:50] "[31m[1mPOST /ingest_data HTTP/1.1[0m" 400 -
+[ 2026-05-05 12:40:16,681 ] 97 werkzeug - INFO - 127.0.0.1 - - [05/May/2026 12:40:16] "[35m[1mPOST /ingest_data HTTP/1.1[0m" 500 -
+[ 2026-05-05 12:40:31,879 ] 97 werkzeug - INFO - 127.0.0.1 - - [05/May/2026 12:40:31] "[35m[1mPOST /ingest_data HTTP/1.1[0m" 500 -
+[ 2026-05-05 12:41:13,373 ] 97 werkzeug - INFO -  * Detected change in '/Users/prince-khatri/Documents/Learning/Meals_prediction_model/app.py', reloading

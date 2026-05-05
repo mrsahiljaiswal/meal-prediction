@@ -1,0 +1,8 @@
+[ 2026-05-02 11:35:25,034 ] 13 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:35:25,050 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-02 11:35:25,064 ] 97 werkzeug - INFO -  * Debugger PIN: 142-471-330
+[ 2026-05-02 11:35:29,460 ] 39 root - INFO - Prediction dataset shape:(13, 8)
+[ 2026-05-02 11:35:29,460 ] 30 root - INFO - Starting prediction pipeline.
+[ 2026-05-02 11:35:29,627 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-02 11:35:29,846 ] 59 root - INFO - Prediction successful.
+[ 2026-05-02 11:35:29,847 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:35:29] "POST /predict HTTP/1.1" 200 -

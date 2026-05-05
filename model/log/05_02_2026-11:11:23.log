@@ -1,0 +1,12 @@
+[ 2026-05-02 11:11:24,008 ] 12 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:11:24,023 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-02 11:11:24,041 ] 97 werkzeug - INFO -  * Debugger PIN: 142-471-330
+[ 2026-05-02 11:11:32,471 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:32] "[33mGET / HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,238 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,240 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,243 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,315 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET / HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,316 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,321 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:36,417 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:11:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+[ 2026-05-02 11:11:48,237 ] 97 werkzeug - INFO -  * Detected change in '/Users/prince-khatri/Documents/Learning/Meals_prediction_model/app.py', reloading

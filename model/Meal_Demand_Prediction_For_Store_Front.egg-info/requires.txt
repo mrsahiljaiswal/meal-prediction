@@ -1,0 +1,9 @@
+pandas
+numpy
+scikit-learn
+seaborn
+xgboost
+catboost
+lightgbm
+dill
+setuptools

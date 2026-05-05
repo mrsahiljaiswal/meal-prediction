@@ -1,0 +1,4 @@
+[ 2026-05-02 11:23:58,565 ] 13 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:23:58,578 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-02 11:23:58,591 ] 97 werkzeug - INFO -  * Debugger PIN: 142-471-330
+[ 2026-05-02 11:24:05,944 ] 97 werkzeug - INFO -  * Detected change in '/Users/prince-khatri/Documents/Learning/Meals_prediction_model/app.py', reloading

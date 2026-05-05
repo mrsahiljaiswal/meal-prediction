@@ -1,0 +1,22 @@
+[ 2026-05-02 11:34:15,971 ] 13 root - INFO - Prediction Pipeline initialized successfully.
+[ 2026-05-02 11:34:15,984 ] 97 werkzeug - WARNING -  * Debugger is active!
+[ 2026-05-02 11:34:16,000 ] 97 werkzeug - INFO -  * Debugger PIN: 142-471-330
+[ 2026-05-02 11:34:18,147 ] 39 root - INFO - Prediction dataset shape:(13, 8)
+[ 2026-05-02 11:34:18,147 ] 36 root - INFO - Starting prediction pipeline.
+[ 2026-05-02 11:34:18,301 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-02 11:34:18,395 ] 70 root - INFO - Final prediction dataset shape: (13, 16)
+[ 2026-05-02 11:34:18,570 ] 85 root - INFO - Prediction successful.
+[ 2026-05-02 11:34:18,571 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:34:18] "POST /predict HTTP/1.1" 200 -
+[ 2026-05-02 11:34:25,214 ] 39 root - INFO - Prediction dataset shape:(13, 8)
+[ 2026-05-02 11:34:25,215 ] 36 root - INFO - Starting prediction pipeline.
+[ 2026-05-02 11:34:25,373 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-02 11:34:25,487 ] 70 root - INFO - Final prediction dataset shape: (13, 16)
+[ 2026-05-02 11:34:25,498 ] 85 root - INFO - Prediction successful.
+[ 2026-05-02 11:34:25,503 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:34:25] "POST /predict HTTP/1.1" 200 -
+[ 2026-05-02 11:34:26,490 ] 39 root - INFO - Prediction dataset shape:(13, 8)
+[ 2026-05-02 11:34:26,490 ] 36 root - INFO - Starting prediction pipeline.
+[ 2026-05-02 11:34:26,643 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-02 11:34:26,743 ] 70 root - INFO - Final prediction dataset shape: (13, 16)
+[ 2026-05-02 11:34:26,750 ] 85 root - INFO - Prediction successful.
+[ 2026-05-02 11:34:26,753 ] 97 werkzeug - INFO - 127.0.0.1 - - [02/May/2026 11:34:26] "POST /predict HTTP/1.1" 200 -
+[ 2026-05-02 11:35:12,735 ] 97 werkzeug - INFO -  * Detected change in '/Users/prince-khatri/Documents/Learning/Meals_prediction_model/src/pipelines/predict_pipeline.py', reloading

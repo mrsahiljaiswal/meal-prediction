@@ -1,0 +1,2 @@
+[ 2026-04-29 14:13:32,011 ] 20 root - INFO - Starting data ingestion process.
+[ 2026-04-29 14:13:32,162 ] 25 root - INFO - Raw data loaded successfully from data/raw/data.csv. Shape: (456548, 9)

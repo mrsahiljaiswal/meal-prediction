@@ -1,0 +1,17 @@
+[ 2026-05-05 12:25:02,295 ] 20 root - INFO - Starting data ingestion process.
+[ 2026-05-05 12:25:02,449 ] 25 root - INFO - Raw data loaded successfully from data/raw/data.csv. Shape: (456548, 9)
+[ 2026-05-05 12:25:02,449 ] 27 root - INFO - Checking if new data exist...
+[ 2026-05-05 12:25:03,222 ] 39 root - INFO - Latest reference data saved at: artifacts/data/historical_data/latest_data.csv
+[ 2026-05-05 12:25:03,313 ] 47 root - INFO - Data split at week 130. Train rows: 403985, Test rows: 52563
+[ 2026-05-05 12:25:04,141 ] 59 root - INFO - Ingested data saved to artifacts/train.csv and artifacts/test.csv
+[ 2026-05-05 12:25:04,143 ] 44 root - INFO - Starting data transformation.
+[ 2026-05-05 12:25:04,292 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-05 12:25:04,416 ] 19 root - INFO - Engineering lag and rolling mean features.
+[ 2026-05-05 12:25:04,439 ] 65 root - INFO - Applying log transformation to target variable.
+[ 2026-05-05 12:25:04,515 ] 79 root - INFO - Transformed data saved at artifacts/transformed_data.pkl
+[ 2026-05-05 12:25:05,063 ] 40 root - INFO - Initializing models for training.
+[ 2026-05-05 12:25:05,064 ] 46 root - INFO - Starting Randomized Search CV.
+[ 2026-05-05 12:26:45,602 ] 61 root - INFO - Best Model Found. Params: {'num_leaves': 63, 'n_estimators': 500, 'learning_rate': 0.01}
+[ 2026-05-05 12:26:45,870 ] 67 root - INFO - Test Metrics: {'wmape': 0.3010708098995791, 'rmsle': 0.5100630394263037, 'mae': 70.74386435392812, 'r2_score': 0.7918860497535889}
+[ 2026-05-05 12:26:45,898 ] 76 root - INFO - Model saved at artifacts/models/best_lgbm_model.pkl
+[ 2026-05-05 12:26:49,334 ] 54 root - INFO - Training complete. Metrics: {'wmape': 0.3010708098995791, 'rmsle': 0.5100630394263037, 'mae': 70.74386435392812, 'r2_score': 0.7918860497535889}

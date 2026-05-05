@@ -1,0 +1,6 @@
+setup.py
+Meal_Demand_Prediction_For_Store_Front.egg-info/PKG-INFO
+Meal_Demand_Prediction_For_Store_Front.egg-info/SOURCES.txt
+Meal_Demand_Prediction_For_Store_Front.egg-info/dependency_links.txt
+Meal_Demand_Prediction_For_Store_Front.egg-info/requires.txt
+Meal_Demand_Prediction_For_Store_Front.egg-info/top_level.txt
