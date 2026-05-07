@@ -1,0 +1,72 @@
+package com.luminescent.pos.service;
+
+import com.luminescent.pos.dto.OrderRequest;
+import com.luminescent.pos.dto.OrderResponse;
+import com.luminescent.pos.entity.CustomerOrder;
+import com.luminescent.pos.entity.Ingredient;
+import com.luminescent.pos.entity.Meal;
+import com.luminescent.pos.entity.MealIngredientMapping;
+import com.luminescent.pos.entity.OrderLineItem;
+import com.luminescent.pos.repository.CustomerOrderRepository;
+import com.luminescent.pos.repository.MealIngredientMappingRepository;
+import com.luminescent.pos.repository.MealRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class OrderService {
+
+    private final MealRepository mealRepository;
+    private final MealIngredientMappingRepository mealIngredientMappingRepository;
+    private final CustomerOrderRepository customerOrderRepository;
+
+    public OrderService(MealRepository mealRepository,
+                        MealIngredientMappingRepository mealIngredientMappingRepository,
+                        CustomerOrderRepository customerOrderRepository) {
+        this.mealRepository = mealRepository;
+        this.mealIngredientMappingRepository = mealIngredientMappingRepository;
+        this.customerOrderRepository = customerOrderRepository;
+    }
+
+    @Transactional
+    public OrderResponse placeOrder(OrderRequest request) {
+        CustomerOrder order = new CustomerOrder();
+        order.setTimestamp(LocalDateTime.now());
+        order.setTotalAmount(0.0);
+
+        List<OrderLineItem> lineItems = new ArrayList<>();
+        double total = 0.0;
+
+        for (OrderRequest.OrderItemRequest itemRequest : request.getItems()) {
+            Meal meal = mealRepository.findById(itemRequest.getMealId())
+                    .orElseThrow(() -> new EntityNotFoundException("Meal not found: " + itemRequest.getMealId()));
+
+            int quantity = itemRequest.getQuantity();
+            total += meal.getCheckoutPrice() * quantity;
+
+            OrderLineItem lineItem = new OrderLineItem();
+            lineItem.setOrder(order);
+            lineItem.setMeal(meal);
+            lineItem.setQuantity(quantity);
+            lineItems.add(lineItem);
+
+            List<MealIngredientMapping> mappings = mealIngredientMappingRepository.findByMeal_Id(meal.getId());
+            for (MealIngredientMapping mapping : mappings) {
+                Ingredient ingredient = mapping.getIngredient();
+                double consumed = mapping.getQuantityRequired() * quantity;
+                double currentStock = ingredient.getCurrentStockQuantity() == null ? 0.0 : ingredient.getCurrentStockQuantity();
+                ingredient.setCurrentStockQuantity(currentStock - consumed);
+            }
+        }
+
+        order.setTotalAmount(total);
+        order.setLineItems(lineItems);
+        CustomerOrder saved = customerOrderRepository.save(order);
+        return new OrderResponse(saved.getId(), saved.getTotalAmount());
+    }
+}

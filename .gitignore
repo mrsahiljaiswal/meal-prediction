@@ -1,0 +1,92 @@
+# Backend (Maven/Java)
+backend/target/
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/*.log
+backend/*.class
+backend/.DS_Store
+
+# Frontend (Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
+frontend/.DS_Store
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Python/ML
+model/__pycache__/
+model/*.py[cod]
+model/*$py.class
+model/*.so
+model/.Python
+model/build/
+model/develop-eggs/
+model/dist/
+model/downloads/
+model/eggs/
+model/.eggs/
+model/lib/
+model/lib64/
+model/parts/
+model/sdist/
+model/var/
+model/wheels/
+model/*.egg-info/
+model/.installed.cfg
+model/*.egg
+model/.env
+model/venv/
+model/.venv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+.env
+.env.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+model/log/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# IDE specific
+.sonarlint/
+*.iml
+
+# ML specific
+model/mlruns/
+model/artifacts/models/*
+!model/artifacts/models/.gitkeep
+model/artifacts/test.csv
+model/artifacts/data/test.csv
+model/artifacts/data/historical_data/latest_data.csv
+
+# System
+Thumbs.db
+.DS_Store

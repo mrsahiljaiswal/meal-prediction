@@ -1,0 +1,49 @@
+artifacts:
+  artifacts_dir: artifacts
+  new_ingested_data: artifacts/new_ingested_data.csv
+  latest_data: artifacts/data/historical_data/latest_data.csv
+  train_data_path: artifacts/data/train.csv
+  test_data_path: artifacts/data/test.csv
+  train_model_file_path: artifacts/models/model.pkl
+  preprocessor_file_path: artifacts/models/preprocessor.pkl
+  model_dir: mlruns/1/models/m-6eab7044b2d6417a8461309573bdb56a/artifacts
+  model_name: model.pkl
+
+data:
+  raw_data_path: artifacts/test.csv
+  split_week: 130
+  test_size: 0.2
+  random_state: 42
+
+model:
+  selected_model: lightgbm
+  n_iter: 5
+  cv: 5
+  random_state: 42
+
+param_grids:
+  lgb:
+    n_estimators: [100, 200, 300]
+    learning_rate: [0.01, 0.05, 0.1]
+    max_depth: [5, 7, 10]
+    num_leaves: [20, 30, 40]
+    subsample: [0.7, 0.8, 0.9]
+    colsample_bytree: [0.7, 0.8, 0.9]
+  xgb:
+    n_estimators: [100, 200, 300]
+    learning_rate: [0.01, 0.05, 0.1]
+    max_depth: [5, 7, 10]
+    subsample: [0.7, 0.8, 0.9]
+    colsample_bytree: [0.7, 0.8, 0.9]
+  cat:
+    iterations: [100, 200, 300]
+    learning_rate: [0.01, 0.05, 0.1]
+    depth: [5, 7, 10]
+    subsample: [0.7, 0.8, 0.9]
+    colsample_bylevel: [0.7, 0.8, 0.9]
+
+mlflow:
+  experiment_name: meal_demand_prediction
+  run_name: default_run
+  tracking_uri: mlruns
+  backend_store_uri: file:mlruns
