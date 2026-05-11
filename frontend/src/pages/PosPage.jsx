@@ -32,7 +32,7 @@ const getImageForMeal = (mealName) => {
   return "https://images.unsplash.com/photo-1495474472205-16284eb8703e?w=600&q=80";
 };
 
-export default function PosPage() {
+export default function PosPage({ auth }) {
   const [meals, setMeals] = useState([]);
   const [cart, setCart] = useState({});
   const [loading, setLoading] = useState(false);
@@ -41,10 +41,39 @@ export default function PosPage() {
 
   useEffect(() => {
     fetchMeals()
-      .then((res) => setMeals(res.data))
+      // Use 'res' directly, and fallback to an empty array just in case
+      .then((res) => setMeals(res || []))
       .catch(() => setMeals([]))
       .finally(() => setMealsLoading(false));
   }, []);
+
+  const handleCheckout = async () => {
+    if (!cartItems.length) return;
+    setLoading(true);
+    setStatus("");
+    try {
+      const response = await placeOrder({
+        items: cartItems.map((i) => ({
+          mealId: i.meal.id,
+          quantity: i.quantity,
+        })),
+      }, auth.centerId, auth.empId); // <-- Pass the credentials into your API!
+      
+      // Use response.orderId instead of response.data.orderId since we are using fetch()
+      setStatus(`Success! Order #${response.orderId} placed.`);
+      setCart({});
+      setTimeout(() => setStatus(""), 4000);
+    } catch (err) {
+      console.error(err);
+      setStatus("Checkout failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ... (keep the rest of your return statement the same) ...
+
+
 
   const addToCart = (meal) => {
     setCart((prev) => ({
@@ -78,26 +107,26 @@ export default function PosPage() {
   const tax = subtotal * 0.08;
   const total = subtotal + serviceCharge + tax;
 
-  const handleCheckout = async () => {
-    if (!cartItems.length) return;
-    setLoading(true);
-    setStatus("");
-    try {
-      const response = await placeOrder({
-        items: cartItems.map((i) => ({
-          mealId: i.meal.id,
-          quantity: i.quantity,
-        })),
-      });
-      setStatus(`Success! Order #${response.data.orderId} placed.`);
-      setCart({});
-      setTimeout(() => setStatus(""), 4000);
-    } catch {
-      setStatus("Checkout failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleCheckout = async () => {
+  //   if (!cartItems.length) return;
+  //   setLoading(true);
+  //   setStatus("");
+  //   try {
+  //     const response = await placeOrder({
+  //       items: cartItems.map((i) => ({
+  //         mealId: i.meal.id,
+  //         quantity: i.quantity,
+  //       })),
+  //     });
+  //     setStatus(`Success! Order #${response.data.orderId} placed.`);
+  //     setCart({});
+  //     setTimeout(() => setStatus(""), 4000);
+  //   } catch {
+  //     setStatus("Checkout failed.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div className="flex h-full pl-8 pb-8 gap-8">
@@ -133,7 +162,7 @@ export default function PosPage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 overflow-y-auto pr-4 pb-12 custom-scrollbar">
-            {meals.map((meal) => {
+            {meals?.map((meal) => {
               const imageUrl = getImageForMeal(meal.name);
               return (
                 <div

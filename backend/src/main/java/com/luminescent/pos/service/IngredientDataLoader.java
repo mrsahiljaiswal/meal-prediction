@@ -15,29 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 @ConditionalOnProperty(name = "luminescent.dataloader.ingredients.enabled", havingValue = "true")
 @Order(20)
 public class IngredientDataLoader implements ApplicationRunner {
 
+    // Expanded realistic ingredient list
     private static final List<String> DEMO_INGREDIENT_NAMES = List.of(
-            "Tomato",
-            "Onion",
-            "Garlic",
-            "Cheese",
-            "Chicken",
-            "Beef",
-            "Lettuce",
-            "Potato",
-            "Rice",
-            "Spices",
-            "Olive Oil",
-            "Pasta Sauce"
+            "Tomato", "Onion", "Garlic", "Cheese", "Chicken", "Beef",
+            "Lettuce", "Potato", "Rice", "Spices", "Olive Oil", "Pasta Sauce",
+            "Pizza Dough", "Milk", "Sugar", "Coffee Beans", "Seafood", "Bread"
     );
 
     private final IngredientRepository ingredientRepository;
@@ -45,8 +35,8 @@ public class IngredientDataLoader implements ApplicationRunner {
     private final MealIngredientMappingRepository mappingRepository;
 
     public IngredientDataLoader(IngredientRepository ingredientRepository,
-                                 MealRepository mealRepository,
-                                 MealIngredientMappingRepository mappingRepository) {
+                                MealRepository mealRepository,
+                                MealIngredientMappingRepository mappingRepository) {
         this.ingredientRepository = ingredientRepository;
         this.mealRepository = mealRepository;
         this.mappingRepository = mappingRepository;
@@ -55,7 +45,6 @@ public class IngredientDataLoader implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         if (mappingRepository.count() > 0) {
-            // Keep mappings as-is, but normalize stocks to lower values for prediction demos.
             normalizeIngredientStocks();
             return;
         }
@@ -82,11 +71,18 @@ public class IngredientDataLoader implements ApplicationRunner {
 
     private Map<String, Ingredient> createIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
+        // Set realistic base units (e.g., Kg for heavy items, Liters/Grams for others)
         for (String name : DEMO_INGREDIENT_NAMES) {
             Ingredient ingredient = new Ingredient();
             ingredient.setName(name);
-            ingredient.setUnitOfMeasure("g");
-            ingredient.setCurrentStockQuantity(200.0);
+
+            if (name.equals("Milk") || name.equals("Olive Oil")) {
+                ingredient.setUnitOfMeasure("L");
+            } else {
+                ingredient.setUnitOfMeasure("Kg");
+            }
+
+            ingredient.setCurrentStockQuantity(50.0);
             ingredients.add(ingredient);
         }
         List<Ingredient> saved = ingredientRepository.saveAll(ingredients);
@@ -101,31 +97,59 @@ public class IngredientDataLoader implements ApplicationRunner {
     @Transactional
     protected void createMappings(Map<String, Ingredient> ingredientByName) {
         List<Meal> meals = mealRepository.findAll();
-        int ingredientCount = DEMO_INGREDIENT_NAMES.size();
-
         List<MealIngredientMapping> mappings = new ArrayList<>();
+
         for (Meal meal : meals) {
-            long mealId = meal.getId();
+            String mealName = meal.getName() != null ? meal.getName().toLowerCase() : "";
 
-            // Deterministically pick ingredients per meal (demo only).
-            Set<Integer> chosenIdx = new LinkedHashSet<>();
-            chosenIdx.add((int) (Math.abs(mealId) % ingredientCount));
-            chosenIdx.add((int) (Math.abs(mealId / 3) % ingredientCount));
-            chosenIdx.add((int) (Math.abs(mealId / 7) % ingredientCount));
-            chosenIdx.add((int) (Math.abs(mealId / 11) % ingredientCount));
+            // Map realistic ingredients based on the meal's name/category
+            Map<String, Double> requiredIngredients = new HashMap<>();
 
-            for (int idx : chosenIdx) {
-                String ingredientName = DEMO_INGREDIENT_NAMES.get(idx);
-                Ingredient ingredient = ingredientByName.get(ingredientName);
+            if (mealName.contains("pizza")) {
+                requiredIngredients.put("Pizza Dough", 0.4);
+                requiredIngredients.put("Cheese", 0.2);
+                requiredIngredients.put("Tomato", 0.1);
+                requiredIngredients.put("Pasta Sauce", 0.1);
+            } else if (mealName.contains("beverage")) {
+                requiredIngredients.put("Milk", 0.2);
+                requiredIngredients.put("Sugar", 0.05);
+                requiredIngredients.put("Coffee Beans", 0.05);
+            } else if (mealName.contains("pasta")) {
+                requiredIngredients.put("Pasta Sauce", 0.2);
+                requiredIngredients.put("Cheese", 0.05);
+                requiredIngredients.put("Garlic", 0.02);
+                requiredIngredients.put("Olive Oil", 0.02);
+            } else if (mealName.contains("seafood")) {
+                requiredIngredients.put("Seafood", 0.3);
+                requiredIngredients.put("Spices", 0.02);
+                requiredIngredients.put("Garlic", 0.01);
+            } else if (mealName.contains("rice") || mealName.contains("biryani")) {
+                requiredIngredients.put("Rice", 0.3);
+                requiredIngredients.put("Chicken", 0.2);
+                requiredIngredients.put("Spices", 0.05);
+                requiredIngredients.put("Onion", 0.05);
+            } else if (mealName.contains("sandwich")) {
+                requiredIngredients.put("Bread", 0.2);
+                requiredIngredients.put("Cheese", 0.05);
+                requiredIngredients.put("Lettuce", 0.05);
+                requiredIngredients.put("Tomato", 0.05);
+            } else {
+                // Generic fallback for "Extras", "Starters", etc.
+                requiredIngredients.put("Potato", 0.2);
+                requiredIngredients.put("Olive Oil", 0.02);
+                requiredIngredients.put("Spices", 0.01);
+            }
 
-                MealIngredientMapping mapping = new MealIngredientMapping();
-                mapping.setMeal(meal);
-                mapping.setIngredient(ingredient);
-
-                // Small quantity so predicted totals stay readable in UI.
-                double quantityRequired = 0.05 * (1 + (mealId % 5)); // 0.05 to 0.25
-                mapping.setQuantityRequired(quantityRequired);
-                mappings.add(mapping);
+            // Create the mapping entities
+            for (Map.Entry<String, Double> entry : requiredIngredients.entrySet()) {
+                Ingredient ingredient = ingredientByName.get(entry.getKey());
+                if (ingredient != null) {
+                    MealIngredientMapping mapping = new MealIngredientMapping();
+                    mapping.setMeal(meal);
+                    mapping.setIngredient(ingredient);
+                    mapping.setQuantityRequired(entry.getValue());
+                    mappings.add(mapping);
+                }
             }
         }
 
@@ -134,17 +158,14 @@ public class IngredientDataLoader implements ApplicationRunner {
 
     private void normalizeIngredientStocks() {
         List<Ingredient> ingredients = ingredientRepository.findAll();
-        if (ingredients.isEmpty()) {
-            return;
-        }
+        if (ingredients.isEmpty()) return;
 
         for (Ingredient ingredient : ingredients) {
+            // Give slightly varied, realistic current stock limits (between 10 and 40 Kg/L)
             long id = ingredient.getId() == null ? 1L : ingredient.getId();
-            // Keep stock intentionally low so "amountToOrder" is visible in dashboard.
-            double stock = 60.0 + ((id % 6) * 25.0); // 60 to 185
+            double stock = 10.0 + ((id % 4) * 10.0);
             ingredient.setCurrentStockQuantity(stock);
         }
         ingredientRepository.saveAll(ingredients);
     }
 }
-

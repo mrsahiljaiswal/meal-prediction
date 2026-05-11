@@ -3,26 +3,31 @@ package com.luminescent.pos.controller;
 import com.luminescent.pos.dto.OrderRequest;
 import com.luminescent.pos.dto.OrderResponse;
 import com.luminescent.pos.service.OrderService;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*") // Allows React to connect
 public class OrderController {
 
-    private final OrderService orderService;
-
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
+    @Autowired
+    private OrderService orderService;
 
     @PostMapping
-    public OrderResponse placeOrder(@Valid @RequestBody OrderRequest request) {
-        return orderService.placeOrder(request);
+    public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest request) {
+        // Saving order with center_id and emp_id
+        OrderResponse response = orderService.processOrder(request);
+        return ResponseEntity.ok(response);
+    }
+
+    // New endpoint to fetch strictly center-specific dashboard data
+    @GetMapping("/center/{centerId}")
+    public ResponseEntity<List<OrderResponse>> getOrdersByCenter(@PathVariable Long centerId) {
+        List<OrderResponse> orders = orderService.getOrdersByCenterId(centerId);
+        return ResponseEntity.ok(orders);
     }
 }

@@ -17,6 +17,18 @@ public class Meal {
     private Integer emailerForPromotion;
     private Integer homepageFeatured;
 
+    // 1. Default constructor required by JPA/Hibernate
+    public Meal() {
+    }
+
+    // 2. Parameterized constructor to fix the instantiation error
+    public Meal(Long id, String category, String cuisine, Double price) {
+        this.id = id;
+        this.name = category + " (" + cuisine + ")"; // e.g., "Beverages (Thai)"
+        this.basePrice = price;
+        this.checkoutPrice = price;
+    }
+
     public Long getId() {
         return id;
     }

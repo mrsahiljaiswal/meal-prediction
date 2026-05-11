@@ -15,6 +15,14 @@ import java.util.List;
 @Entity
 @Table(name = "customer_orders")
 public class CustomerOrder {
+    private Long centerId;
+    private String empId;
+
+    // Add Getters and Setters for centerId and empId
+    public Long getCenterId() { return centerId; }
+    public void setCenterId(Long centerId) { this.centerId = centerId; }
+    public String getEmpId() { return empId; }
+    public void setEmpId(String empId) { this.empId = empId; }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
