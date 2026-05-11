@@ -4,26 +4,15 @@ import { fetchPrediction } from "../api";
 export default function PredictPage() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
   const handlePredict = async () => {
     setLoading(true);
-    setError("");
     try {
       const response = await fetchPrediction();
       setRows(response.data);
       setHasSearched(true);
     } catch (err) {
-      const backendMsg =
-        err?.response?.data?.message ||
-        err?.response?.data ||
-        err?.message;
-      setError(
-        typeof backendMsg === "string"
-          ? backendMsg
-          : "Unable to fetch forecast. Ensure backend and ML API are running."
-      );
       setHasSearched(true);
     } finally {
       setLoading(false);
@@ -31,57 +20,100 @@ export default function PredictPage() {
   };
 
   return (
-    <section className="rounded-xl bg-white p-6 shadow-sm">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div className="px-8 pb-12">
+      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-8">
         <div>
-          <h2 className="text-2xl font-semibold">Inventory Forecasting Dashboard</h2>
-          <p className="text-sm text-slate-500">
-            Predict next week ingredient demand and required purchase amount.
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+            AI Inventory Forecast
+          </h2>
+          <p className="text-slate-500 mt-1 text-sm">
+            Automated ingredient purchase requirements for next week.
           </p>
         </div>
         <button
           onClick={handlePredict}
           disabled={loading}
-          className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition hover:bg-indigo-700 disabled:bg-slate-300"
+          className="rounded-full bg-[#F0592A] px-6 py-3 font-bold text-white transition hover:bg-orange-600 shadow-md shadow-orange-200"
         >
-          {loading ? "Loading..." : "Get Next Week's Prediction"}
+          {loading ? "Analyzing Models..." : "Run Weekly Forecast"}
         </button>
       </div>
 
-      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-0">
-          <thead>
-            <tr className="bg-slate-100 text-left text-sm uppercase tracking-wide text-slate-600">
-              <th className="rounded-l-lg px-4 py-3">Ingredient</th>
-              <th className="px-4 py-3">Current Stock</th>
-              <th className="px-4 py-3">Predicted Need</th>
-              <th className="rounded-r-lg px-4 py-3">Amount to Order</th>
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <table className="min-w-full text-left">
+          <thead className="bg-slate-50 border-b border-slate-100">
+            <tr>
+              <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400">
+                Ingredient Name
+              </th>
+              <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">
+                Current Stock
+              </th>
+              <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">
+                Predicted Need
+              </th>
+              <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">
+                Amount to Order
+              </th>
+              <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">
+                Status
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-50">
             {rows.length === 0 ? (
               <tr>
-                <td colSpan="4" className="px-4 py-8 text-center text-slate-500">
+                <td
+                  colSpan="5"
+                  className="px-6 py-16 text-center text-slate-400 text-sm font-semibold"
+                >
                   {!hasSearched
-                    ? "No prediction data yet. Click the button above."
-                    : "Prediction returned no rows. Check DB loaders and ML API health."}
+                    ? "Ready to predict. Click 'Run Weekly Forecast'."
+                    : "No prediction data found. Ensure ML API is online."}
                 </td>
               </tr>
             ) : (
-              rows.map((row, index) => (
-                <tr key={`${row.ingredientName}-${index}`} className="border-b border-slate-100">
-                  <td className="px-4 py-3 font-medium">{row.ingredientName}</td>
-                  <td className="px-4 py-3">{Number(row.currentStockQuantity).toFixed(2)}</td>
-                  <td className="px-4 py-3">{Number(row.predictedRequiredAmount).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-amber-700">{Number(row.amountToOrder).toFixed(2)}</td>
-                </tr>
-              ))
+              rows.map((row, index) => {
+                const needsOrder = row.amountToOrder > 0;
+                return (
+                  <tr
+                    key={`${row.ingredientName}-${index}`}
+                    className="hover:bg-orange-50/30 transition-colors"
+                  >
+                    <td className="px-6 py-5 font-bold text-slate-800">
+                      {row.ingredientName}
+                    </td>
+                    <td className="px-6 py-5 text-right text-slate-500 font-medium">
+                      {Number(row.currentStockQuantity).toFixed(1)}g
+                    </td>
+                    <td className="px-6 py-5 text-right text-[#F0592A] font-bold">
+                      {Number(row.predictedRequiredAmount).toFixed(1)}g
+                    </td>
+                    <td
+                      className={`px-6 py-5 text-right font-black ${needsOrder ? "text-rose-500" : "text-slate-300"}`}
+                    >
+                      {Number(row.amountToOrder).toFixed(1)}g
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      {needsOrder ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[10px] uppercase tracking-wider font-bold text-rose-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-rose-500"></span>{" "}
+                          Reorder
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] uppercase tracking-wider font-bold text-emerald-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{" "}
+                          Safe
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 }
