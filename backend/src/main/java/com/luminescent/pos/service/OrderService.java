@@ -2,11 +2,8 @@ package com.luminescent.pos.service;
 
 import com.luminescent.pos.dto.OrderRequest;
 import com.luminescent.pos.dto.OrderResponse;
-import com.luminescent.pos.entity.CustomerOrder;
-import com.luminescent.pos.entity.Ingredient;
-import com.luminescent.pos.entity.Meal;
-import com.luminescent.pos.entity.MealIngredientMapping;
-import com.luminescent.pos.entity.OrderLineItem;
+import com.luminescent.pos.entity.*;
+import com.luminescent.pos.repository.CenterInventoryRepository;
 import com.luminescent.pos.repository.CustomerOrderRepository;
 import com.luminescent.pos.repository.MealIngredientMappingRepository;
 import com.luminescent.pos.repository.MealRepository;
@@ -24,14 +21,18 @@ public class OrderService {
     private final MealRepository mealRepository;
     private final MealIngredientMappingRepository mealIngredientMappingRepository;
     private final CustomerOrderRepository customerOrderRepository;
+    private final CenterInventoryRepository centerInventoryRepository;
 
     public OrderService(MealRepository mealRepository,
                         MealIngredientMappingRepository mealIngredientMappingRepository,
-                        CustomerOrderRepository customerOrderRepository) {
+                        CustomerOrderRepository customerOrderRepository,
+                        CenterInventoryRepository centerInventoryRepository) {
         this.mealRepository = mealRepository;
         this.mealIngredientMappingRepository = mealIngredientMappingRepository;
         this.customerOrderRepository = customerOrderRepository;
+        this.centerInventoryRepository = centerInventoryRepository;
     }
+
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request) {
@@ -60,7 +61,22 @@ public class OrderService {
                 Ingredient ingredient = mapping.getIngredient();
                 double consumed = mapping.getQuantityRequired() * quantity;
                 double currentStock = ingredient.getCurrentStockQuantity() == null ? 0.0 : ingredient.getCurrentStockQuantity();
-                ingredient.setCurrentStockQuantity(currentStock - consumed);
+                double normalizedConsumption =
+                        UnitConversionService.normalize(
+                                mapping.getQuantityRequired(),
+                                ingredient.getUnit()
+                        ) * quantity;
+
+                if(currentStock < normalizedConsumption){
+                    throw new RuntimeException(
+                            "Insufficient stock for ingredient: "
+                                    + ingredient.getName()
+                    );
+                }
+
+                ingredient.setCurrentStockQuantity(
+                        currentStock - normalizedConsumption
+                );
             }
         }
 
@@ -72,6 +88,10 @@ public class OrderService {
 
     @Transactional
     public OrderResponse processOrder(OrderRequest request) {
+        if (request.getCenterId() == null) {
+            throw new IllegalArgumentException("centerId is required");
+        }
+
         CustomerOrder order = new CustomerOrder();
         order.setTimestamp(LocalDateTime.now());
         order.setTotalAmount(0.0);
@@ -87,6 +107,12 @@ public class OrderService {
             Meal meal = mealRepository.findById(itemRequest.getMealId())
                     .orElseThrow(() -> new EntityNotFoundException("Meal not found: " + itemRequest.getMealId()));
 
+            if (meal.getCenterId() == null || !request.getCenterId().equals(meal.getCenterId().longValue())) {
+                throw new IllegalArgumentException(
+                        "Meal " + meal.getId() + " is not available for center " + request.getCenterId()
+                );
+            }
+
             int quantity = itemRequest.getQuantity();
             total += meal.getCheckoutPrice() * quantity;
 
@@ -100,9 +126,30 @@ public class OrderService {
             List<MealIngredientMapping> mappings = mealIngredientMappingRepository.findByMeal_Id(meal.getId());
             for (MealIngredientMapping mapping : mappings) {
                 Ingredient ingredient = mapping.getIngredient();
-                double consumed = mapping.getQuantityRequired() * quantity;
-                double currentStock = ingredient.getCurrentStockQuantity() == null ? 0.0 : ingredient.getCurrentStockQuantity();
-                ingredient.setCurrentStockQuantity(currentStock - consumed);
+                CenterInventory centerInventory = centerInventoryRepository
+                        .findByCenterIdAndIngredient_Id(request.getCenterId(), ingredient.getId())
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "No inventory found for center "
+                                        + request.getCenterId()
+                                        + " and ingredient "
+                                        + ingredient.getName()
+                        ));
+
+                double consumed = UnitConversionService.normalize(
+                        mapping.getQuantityRequired(),
+                        ingredient.getUnit()
+                ) * quantity;
+                double currentStock = centerInventory.getCurrentStockQuantity() == null
+                        ? 0.0
+                        : centerInventory.getCurrentStockQuantity();
+
+                if (currentStock < consumed) {
+                    throw new RuntimeException(
+                            "Insufficient stock for ingredient: " + ingredient.getName()
+                    );
+                }
+
+                centerInventory.setCurrentStockQuantity(currentStock - consumed);
             }
         }
 

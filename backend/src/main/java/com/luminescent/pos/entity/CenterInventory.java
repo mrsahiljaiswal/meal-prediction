@@ -1,6 +1,7 @@
 package com.luminescent.pos.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,22 +10,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "meal_ingredient_mapping")
-public class MealIngredientMapping {
+@Table(name = "center_inventory")
+public class CenterInventory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "meal_id")
-    private Meal meal;
+    private Long centerId;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
-    private Double quantityRequired;
+    private Double currentStockQuantity;
 
     public Long getId() {
         return id;
@@ -34,12 +33,12 @@ public class MealIngredientMapping {
         this.id = id;
     }
 
-    public Meal getMeal() {
-        return meal;
+    public Long getCenterId() {
+        return centerId;
     }
 
-    public void setMeal(Meal meal) {
-        this.meal = meal;
+    public void setCenterId(Long centerId) {
+        this.centerId = centerId;
     }
 
     public Ingredient getIngredient() {
@@ -50,11 +49,11 @@ public class MealIngredientMapping {
         this.ingredient = ingredient;
     }
 
-    public double getQuantityRequired() {
-        return quantityRequired;
+    public Double getCurrentStockQuantity() {
+        return currentStockQuantity;
     }
 
-    public void setQuantityRequired(Double quantityRequired) {
-        this.quantityRequired = quantityRequired;
+    public void setCurrentStockQuantity(Double currentStockQuantity) {
+        this.currentStockQuantity = currentStockQuantity;
     }
 }

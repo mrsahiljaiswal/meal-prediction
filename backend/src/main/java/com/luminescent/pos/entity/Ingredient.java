@@ -1,10 +1,6 @@
 package com.luminescent.pos.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ingredients")
@@ -15,7 +11,8 @@ public class Ingredient {
     private Long id;
     private String name;
     private Double currentStockQuantity;
-    private String unitOfMeasure;
+    @Enumerated(EnumType.STRING)
+    private Unit unit;
 
     public Long getId() {
         return id;
@@ -41,11 +38,11 @@ public class Ingredient {
         this.currentStockQuantity = currentStockQuantity;
     }
 
-    public String getUnitOfMeasure() {
-        return unitOfMeasure;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setUnitOfMeasure(String unitOfMeasure) {
-        this.unitOfMeasure = unitOfMeasure;
+    public void setUnit(Unit unitOfMeasure) {
+        this.unit = unitOfMeasure;
     }
 }
