@@ -30,6 +30,7 @@ def predict_route():
 
     # Get JSON data from request
     data = request.get_json()
+    logging.info(f"Raw request data: {data}")
     
     # Expected format: {"samples": [{"meal_id": 123, "center_id": 55, ...}, {...}]}
     if not data or 'samples' not in data:
@@ -37,7 +38,50 @@ def predict_route():
 
     # Convert list of dicts to DataFrame
     input_df = pd.DataFrame(data['samples'])
-    
+    logging.info(f"Initial DataFrame dtypes: {input_df.dtypes.to_dict()}")
+
+    if input_df.empty:
+        return jsonify({"error": "No prediction samples provided."}), 400
+
+    required_columns = [
+        'center_id', 'meal_id', 'week',
+        'checkout_price', 'base_price',
+        'emailer_for_promotion', 'homepage_featured'
+    ]
+    missing_columns = [col for col in required_columns if col not in input_df.columns]
+    if missing_columns:
+        return jsonify({
+            "error": "Missing required columns for prediction.",
+            "missing_columns": missing_columns
+        }), 400
+
+    # Force numeric/bool columns to proper dtypes, since JSON input may arrive as strings
+    for col in required_columns:
+        input_df[col] = pd.to_numeric(input_df[col], errors='coerce')
+
+    invalid_numeric = [
+        col for col in required_columns
+        if input_df[col].isna().any()
+    ]
+    if invalid_numeric:
+        logging.error(f"Non-numeric values found in: {invalid_numeric}. Sample values: {[(col, input_df[col].dropna().head(3).tolist()) for col in invalid_numeric]}")
+        return jsonify({
+            "error": "Invalid input values for numeric/bool fields.",
+            "invalid_columns": invalid_numeric
+        }), 400
+
+    input_df = input_df.astype({
+        'center_id': 'int64',
+        'meal_id': 'int64',
+        'week': 'int64',
+        'checkout_price': 'float64',
+        'base_price': 'float64',
+        'emailer_for_promotion': 'int64',
+        'homepage_featured': 'int64'
+    })
+    logging.info(f"Final prediction input dtypes: {input_df.dtypes.to_dict()}")
+    logging.info(f"Sample row from input: {input_df.iloc[0].to_dict() if len(input_df) > 0 else 'empty'}")
+
     # Keep track of meal_ids to map them back to results
     meal_ids = input_df['meal_id'].tolist()
     logging.info(f"Prediction dataset shape:{input_df.shape}")

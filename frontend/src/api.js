@@ -5,10 +5,11 @@ const api = axios.create({
 });
 
 // export const placeOrder = (payload) => api.post("/api/orders", payload);
-export const fetchPrediction = () => api.get("/api/inventory/predict-next-week");
-export const fetchModelVsActual = (limit = 40) =>
-  api.get(`/api/inventory/model-vs-actual?limit=${limit}`);
-const BASE_URL = "http://localhost:8081/api";
+export const fetchPrediction = (centerId) =>
+  api.get("/api/inventory/predict-next-week", { params: { centerId } });
+export const fetchModelVsActual = (limit = 40, centerId) =>
+  api.get("/api/inventory/model-vs-actual", { params: { limit, centerId } });
+const BASE_URL = "http://localhost:8082/api";
 
 // Fetch inventory dynamically for the logged-in center
 export const fetchInventory = async (centerId) => {
@@ -17,8 +18,9 @@ export const fetchInventory = async (centerId) => {
   return response.json();
 };
 
-export const fetchMeals = async () => {
-  const response = await fetch(`${BASE_URL}/meals`);
+export const fetchMeals = async (centerId) => {
+  const path = centerId ? `/meals/center/${centerId}` : "/meals";
+  const response = await fetch(`${BASE_URL}${path}`);
   if (!response.ok) throw new Error("Failed to fetch meals");
   return response.json();
 };

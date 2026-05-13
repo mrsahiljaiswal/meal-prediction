@@ -18,6 +18,9 @@ class DataTransformation:
         """
         logging.info("Engineering lag and rolling mean features.")
         
+        # Preserve original dtypes of numeric columns
+        original_dtypes = df.dtypes.copy()
+        
         # Sort values to ensure lags are calculated correctly
         df = df.sort_values(['meal_id', 'center_id', 'week'])
 
@@ -36,6 +39,14 @@ class DataTransformation:
         # Trend features
         df['trend'] = df['lag_1'] - df['lag_2']
         df['growth'] = df['lag_1'] / (df['lag_2'] + 1)
+
+        # Restore original numeric column dtypes to prevent object dtype conversion
+        for col in original_dtypes.index:
+            if col in df.columns and original_dtypes[col] != 'object':
+                try:
+                    df[col] = df[col].astype(original_dtypes[col])
+                except Exception as e:
+                    logging.warning(f"Could not restore dtype for {col}: {e}")
 
         return df
 

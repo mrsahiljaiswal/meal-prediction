@@ -5,6 +5,12 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import LoginPage from "./pages/LoginPage";
 import PredictPage from "./pages/PredictPage";
 
+const navItems = [
+  { to: "/", label: "Terminal" },
+  { to: "/predict", label: "Forecast" },
+  { to: "/analytics", label: "Analytics" },
+];
+
 function App() {
   const [auth, setAuth] = useState({ centerId: null, empId: null });
   const location = useLocation();
@@ -18,74 +24,67 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 flex flex-col">
-      {/* Sleek Top Navigation Bar - Only visible when logged in */}
+    <div className="min-h-screen bg-background text-on-surface">
       {auth.centerId && (
-        <nav className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm z-10">
-          <div className="flex items-center gap-8">
+        <header className="sticky top-0 z-50 border-b border-outline-variant/60 bg-background/85 backdrop-blur-xl">
+          <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-5 md:px-12">
+            <div className="flex items-center gap-8">
+              <Link to="/" className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-outline-variant bg-white text-primary shadow-soft">
+                  <span className="font-serif text-2xl font-bold italic">C</span>
+                </div>
+                <span className="font-serif text-2xl font-bold text-primary">
+                  CafeOps
+                </span>
+              </Link>
+
+              <nav className="hidden items-center gap-8 md:flex">
+                {navItems.map((item) => {
+                  const active = location.pathname === item.to;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className={`border-b-2 pb-1 text-sm font-semibold transition ${
+                        active
+                          ? "border-primary text-primary"
+                          : "border-transparent text-on-surface-variant hover:text-primary"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-xl font-bold">
-                C
+              <button className="hidden rounded-full p-2 text-on-surface-variant transition hover:bg-surface-container md:inline-flex">
+                <span className="material-symbols-outlined">notifications</span>
+              </button>
+              <button className="hidden rounded-full p-2 text-on-surface-variant transition hover:bg-surface-container md:inline-flex">
+                <span className="material-symbols-outlined">settings</span>
+              </button>
+              <div className="hidden h-8 w-px bg-outline-variant md:block" />
+              <div className="text-right">
+                <p className="text-sm font-semibold">Center {auth.centerId}</p>
+                <p className="text-xs italic text-secondary">Emp {auth.empId}</p>
               </div>
-              <span className="text-xl font-bold text-slate-800">CafeOps</span>
-            </div>
-
-            <div className="flex space-x-1 border border-slate-200 p-1 rounded-xl bg-slate-50">
-              <Link
-                to="/"
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${location.pathname === "/" ? "bg-white shadow-sm text-amber-600" : "text-slate-500 hover:text-slate-800"}`}
+              <button
+                onClick={handleLogout}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary-container text-secondary transition hover:scale-105"
+                title="End Shift"
               >
-                Terminal
-              </Link>
-              <Link
-                to="/predict"
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${location.pathname === "/predict" ? "bg-white shadow-sm text-amber-600" : "text-slate-500 hover:text-slate-800"}`}
-              >
-                Forecast
-              </Link>
-              <Link
-                to="/analytics"
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${location.pathname === "/analytics" ? "bg-white shadow-sm text-amber-600" : "text-slate-500 hover:text-slate-800"}`}
-              >
-                Analytics
-              </Link>
+                <span className="material-symbols-outlined text-[20px]">
+                  logout
+                </span>
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-bold text-slate-800">
-                Center: {auth.centerId}
-              </p>
-              <p className="text-xs text-slate-500 font-medium">
-                Emp: {auth.empId}
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-rose-500 bg-slate-100 rounded-full hover:bg-rose-50 transition-colors"
-              title="End Shift"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-            </button>
-          </div>
-        </nav>
+        </header>
       )}
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-hidden relative">
+      <main className={auth.centerId ? "min-h-[calc(100vh-80px)]" : "min-h-screen"}>
         <Routes>
           <Route
             path="/login"
@@ -97,8 +96,6 @@ function App() {
               )
             }
           />
-
-          {/* Protected Routes */}
           <Route
             path="/"
             element={
