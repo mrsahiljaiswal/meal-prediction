@@ -6,6 +6,18 @@ import jakarta.persistence.*;
 @Table(name = "meal_recipe")
 public class MealRecipe {
 
+    @Override
+    public String toString() {
+        return "MealRecipe{" +
+                "id=" + id +
+                ", meal=" + meal +
+                ", ingredient=" + ingredient +
+                ", quantityRequired=" + quantityRequired +
+                ", unit='" + unit + '\'' +
+                ", wastagePercentage=" + wastagePercentage +
+                '}';
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -78,4 +90,5 @@ public class MealRecipe {
     public void setWastagePercentage(Double wastagePercentage) {
         this.wastagePercentage = wastagePercentage;
     }
+
 }

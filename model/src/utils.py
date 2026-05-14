@@ -43,7 +43,8 @@ def calculate_regression_metrics(y_true, y_pred, is_log_transformed=True):
     # Ensure no negative predictions for metrics that don't allow them
     y_pred = np.maximum(y_pred, 0)
 
-    wmape = np.sum(np.abs(y_true - y_pred)) / np.sum(y_true)
+    y_true_sum = np.sum(y_true)
+    wmape = 0.0 if y_true_sum == 0 else np.sum(np.abs(y_true - y_pred)) / y_true_sum
     rmsle = np.sqrt(np.mean((np.log1p(y_pred) - np.log1p(y_true))**2))
     mae = np.mean(np.abs(y_true - y_pred))
     r2 = r2_score(y_true, y_pred)

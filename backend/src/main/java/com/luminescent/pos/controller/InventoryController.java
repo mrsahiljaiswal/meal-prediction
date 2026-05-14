@@ -1,6 +1,8 @@
 package com.luminescent.pos.controller;
 
 import com.luminescent.pos.dto.CenterInventoryResponse;
+import com.luminescent.pos.dto.BaselineSalesResponse;
+import com.luminescent.pos.dto.ModelMetricsResponse;
 import com.luminescent.pos.dto.ModelVsActualResponse;
 import com.luminescent.pos.dto.PredictedIngredientResponse;
 import com.luminescent.pos.entity.CenterInventory;
@@ -34,7 +36,7 @@ public class InventoryController {
 
     @GetMapping("/predict-next-week")
     public List<PredictedIngredientResponse> predictNextWeek(
-            @RequestParam(required = false) Long centerId
+            @RequestParam(required = true) Long centerId
     ) {
         return inventoryForecastService.predictNextWeekIngredientDemand(centerId);
     }
@@ -58,6 +60,16 @@ public class InventoryController {
             @RequestParam(required = false) Long centerId
     ) {
         return inventoryForecastService.getModelVsActual(limit, centerId);
+    }
+
+    @GetMapping("/model-metrics")
+    public ModelMetricsResponse modelMetrics() {
+        return inventoryForecastService.getModelMetrics();
+    }
+
+    @GetMapping("/baseline-sales/{centerId}")
+    public BaselineSalesResponse baselineSales(@PathVariable Long centerId) {
+        return inventoryForecastService.getBaselineSales(centerId);
     }
 
     private CenterInventoryResponse toResponse(CenterInventory inventory) {

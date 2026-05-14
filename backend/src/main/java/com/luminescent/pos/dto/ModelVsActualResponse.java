@@ -6,15 +6,18 @@ public class ModelVsActualResponse {
     private int sampleSize;
     private double meanAbsoluteError;
     private double meanAbsolutePercentageError;
+    private double rSquared;
     private List<ModelVsActualPoint> points;
 
     public ModelVsActualResponse(int sampleSize,
                                  double meanAbsoluteError,
                                  double meanAbsolutePercentageError,
+                                 double rSquared,
                                  List<ModelVsActualPoint> points) {
         this.sampleSize = sampleSize;
         this.meanAbsoluteError = meanAbsoluteError;
         this.meanAbsolutePercentageError = meanAbsolutePercentageError;
+        this.rSquared = rSquared;
         this.points = points;
     }
 
@@ -40,6 +43,14 @@ public class ModelVsActualResponse {
 
     public void setMeanAbsolutePercentageError(double meanAbsolutePercentageError) {
         this.meanAbsolutePercentageError = meanAbsolutePercentageError;
+    }
+
+    public double getRSquared() {
+        return rSquared;
+    }
+
+    public void setRSquared(double rSquared) {
+        this.rSquared = rSquared;
     }
 
     public List<ModelVsActualPoint> getPoints() {

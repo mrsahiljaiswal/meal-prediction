@@ -11,4 +11,8 @@ public interface MealRecipeRepository
     List<MealRecipe> findByMealId(Long mealId);
 
     List<MealRecipe> findByMeal_IdIn(List<Long> mealIds);
+
+//    List<MealRecipe> findByMeal_MealIdInAndCenterId(List<Long> mealIds, Long centerId);
+
+    List<MealRecipe> findByMeal_MealIdInAndMeal_CenterId(List<Long> mealIds, Long centerId);
 }

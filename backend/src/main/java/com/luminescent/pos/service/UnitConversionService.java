@@ -15,7 +15,7 @@ public class UnitConversionService {
 
             case LITER -> quantity * 1000;
 
-            case GRAM, ML, PIECE -> quantity;
+            case GRAM, ML, MILLILITER, PIECE -> quantity;
 
         };
     }

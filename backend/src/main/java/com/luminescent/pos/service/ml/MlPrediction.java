@@ -6,6 +6,14 @@ public class MlPrediction {
     @JsonProperty("meal_id")
     private Long mealId;
 
+    @Override
+    public String toString() {
+        return "MlPrediction{" +
+                "mealId=" + mealId +
+                ", predictedOrders=" + predictedOrders +
+                '}';
+    }
+
     @JsonProperty("predicted_orders")
     private Double predictedOrders;
 

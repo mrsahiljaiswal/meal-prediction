@@ -92,4 +92,8 @@ public class Meal {
     }
 
     public String getImageUrl() {return imageUrl;}
+
+    public Long getMealId() {
+        return this.mealId;
+    }
 }

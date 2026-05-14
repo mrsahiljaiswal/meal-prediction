@@ -5,6 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class MlPredictResponse {
+    @Override
+    public String toString() {
+        return "MlPredictResponse{" +
+                "predictions=" + predictions +
+                '}';
+    }
+
     @JsonProperty("predictions")
     private List<MlPrediction> predictions;
 
