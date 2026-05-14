@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { fetchMeals, fetchModelMetrics, fetchModelVsActual } from "../api";
+import { fetchModelMetrics, fetchModelVsActual } from "../api";
 
 const money = (value) =>
   `$${Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -24,6 +24,7 @@ export default function AnalyticsPage({ auth }) {
   const [data, setData] = useState([]);
   const [totals, setTotals] = useState({
     modelProfit: 0,
+    baselineProfit: 0,
     predictedOrders: 0,
     accuracy: 0,
     rSquared: 0,
@@ -33,19 +34,10 @@ export default function AnalyticsPage({ auth }) {
     setLoading(true);
     setError("");
     try {
-      const [mealsRes, mlRes, metricsRes] = await Promise.all([
-        fetchMeals(auth?.centerId),
+      const [mlRes, metricsRes] = await Promise.all([
         fetchModelVsActual(60, auth?.centerId),
         fetchModelMetrics(),
       ]);
-
-      const meals = (Array.isArray(mealsRes) ? mealsRes : mealsRes.data || []).map(
-        (meal) => ({
-          mealId: meal.mealId ?? meal.meal_id ?? meal.id,
-          checkoutPrice: Number(meal.checkoutPrice ?? meal.checkout_price ?? 0),
-          basePrice: Number(meal.basePrice ?? meal.base_price ?? 0),
-        }),
-      );
 
       const points = (mlRes.data.points || []).map((point) => ({
         mealId: point.mealId ?? point.meal_id,
@@ -54,20 +46,29 @@ export default function AnalyticsPage({ auth }) {
         predictedOrders: Number(
           point.predictedOrders ?? point.predicted_orders ?? 0,
         ),
+        checkoutPrice: Number(point.checkoutPrice ?? point.checkout_price ?? 0),
+        basePrice: Number(point.basePrice ?? point.base_price ?? 0),
+        modelProfit: Number(point.modelProfit ?? point.model_profit ?? 0),
+        baselineOrders: Number(
+          point.baselineOrders ?? point.baseline_orders ?? 0,
+        ),
+        baselineProfit: Number(
+          point.baselineProfit ?? point.baseline_profit ?? 0,
+        ),
       }));
 
       let modelProfitTotal = 0;
+      let baselineProfitTotal = 0;
       let predictedOrdersTotal = 0;
       let accuracyTotal = 0;
 
-      const chartData = points.map((point, index) => {
-        const meal = meals.find(
-          (mealItem) => String(mealItem.mealId) === String(point.mealId),
-        );
-        const checkoutPrice = meal?.checkoutPrice ?? 0;
-        const basePrice = meal?.basePrice ?? 0;
-        const unitProfit = Math.max(0, checkoutPrice - basePrice);
-        const modelProfit = point.predictedOrders * unitProfit;
+      const weeklyData = new Map();
+
+      points.forEach((point) => {
+        const modelProfit =
+          point.modelProfit || point.predictedOrders * point.checkoutPrice;
+        const baselineProfit =
+          point.baselineProfit || point.baselineOrders * point.checkoutPrice;
         const accuracy =
           point.actualOrders > 0
             ? Math.max(
@@ -80,20 +81,47 @@ export default function AnalyticsPage({ auth }) {
             : 0;
 
         modelProfitTotal += modelProfit;
+        baselineProfitTotal += baselineProfit;
         predictedOrdersTotal += point.predictedOrders;
         accuracyTotal += accuracy;
 
-        return {
+        const weekEntry = weeklyData.get(point.week) || {
           label: `Week ${point.week}`,
-          shortLabel: `#${index + 1}`,
-          modelProfit: Number(modelProfit.toFixed(2)),
-          predictedOrders: Number(point.predictedOrders.toFixed(2)),
-          accuracy: Number(accuracy.toFixed(1)),
+          shortLabel: `W${point.week}`,
+          week: point.week,
+          modelProfit: 0,
+          baselineProfit: 0,
+          predictedOrders: 0,
+          accuracyTotal: 0,
+          count: 0,
         };
+        weekEntry.modelProfit += modelProfit;
+        weekEntry.baselineProfit += baselineProfit;
+        weekEntry.predictedOrders += point.predictedOrders;
+        weekEntry.accuracyTotal += accuracy;
+        weekEntry.count += 1;
+        weeklyData.set(point.week, weekEntry);
       });
+
+      const chartData = Array.from(weeklyData.values())
+        .sort((a, b) => a.week - b.week)
+        .map((weekEntry) => ({
+          label: weekEntry.label,
+          shortLabel: weekEntry.shortLabel,
+          modelProfit: Number(weekEntry.modelProfit.toFixed(2)),
+          baselineProfit: Number(weekEntry.baselineProfit.toFixed(2)),
+          predictedOrders: Number(weekEntry.predictedOrders.toFixed(2)),
+          accuracy: Number(
+            (weekEntry.count
+              ? weekEntry.accuracyTotal / weekEntry.count
+              : 0
+            ).toFixed(1),
+          ),
+        }));
 
       setTotals({
         modelProfit: modelProfitTotal,
+        baselineProfit: baselineProfitTotal,
         predictedOrders: predictedOrdersTotal,
         accuracy: points.length ? accuracyTotal / points.length : 0,
         rSquared:
@@ -126,11 +154,11 @@ export default function AnalyticsPage({ auth }) {
       meta: "Predicted",
     },
     {
-      label: "Predicted Orders",
-      value: formatNumber(totals.predictedOrders),
-      icon: "monitoring",
+      label: "Baseline",
+      value: money(totals.baselineProfit),
+      icon: "shopping_bag",
       tone: "secondary",
-      meta: "Model",
+      meta: "Historical",
     },
     {
       label: "Model R2 Score",
@@ -203,7 +231,7 @@ export default function AnalyticsPage({ auth }) {
           <div className="mb-8">
             <h3 className="font-serif text-3xl">Model Profit Trajectory</h3>
             <p className="text-sm italic text-on-surface-variant">
-              Profit calculated from predicted orders and current meal margins.
+              Model projection compared with baselineOrders * checkoutPrice.
             </p>
           </div>
 
@@ -236,6 +264,20 @@ export default function AnalyticsPage({ auth }) {
                       />
                       <stop offset="95%" stopColor="#4a654e" stopOpacity={0} />
                     </linearGradient>
+                    <linearGradient
+                      id="baselineFill"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#7b535c"
+                        stopOpacity={0.16}
+                      />
+                      <stop offset="95%" stopColor="#7b535c" stopOpacity={0} />
+                    </linearGradient>
                   </defs>
                   <CartesianGrid stroke="#e4e2de" strokeDasharray="3 3" />
                   <XAxis
@@ -249,7 +291,7 @@ export default function AnalyticsPage({ auth }) {
                       border: "1px solid #c2c8c0",
                       boxShadow: "0 10px 30px -10px rgba(74,101,78,.2)",
                     }}
-                    formatter={(value) => [money(value), "Model Profit"]}
+                    formatter={(value, name) => [money(value), name]}
                   />
                   <Area
                     type="monotone"
@@ -258,6 +300,14 @@ export default function AnalyticsPage({ auth }) {
                     stroke="#4a654e"
                     strokeWidth={3}
                     fill="url(#modelFill)"
+                  />
+                  <Area
+                    type="monotone"
+                    name="Baseline"
+                    dataKey="baselineProfit"
+                    stroke="#7b535c"
+                    strokeWidth={3}
+                    fill="url(#baselineFill)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -305,8 +355,8 @@ export default function AnalyticsPage({ auth }) {
               <span className="italic opacity-90">sampled rows</span>
             </div>
             <p className="mt-6 text-sm leading-relaxed opacity-85">
-              Model profit uses predicted orders multiplied by positive current
-              meal margin.
+              Baseline uses historical average orders multiplied by checkout
+              price from backend train.csv rows.
             </p>
           </div>
         </div>

@@ -227,8 +227,9 @@ public class InventoryForecastService {
     }
 
     public ModelVsActualResponse getModelVsActual(int limit, Long centerId) {
-        int safeLimit = Math.max(5, Math.min(limit, 300));
+        int safeLimit = Math.max(5, 3500);
         List<TrainSampleRow> rows = loadTrainSamples(safeLimit, centerId);
+        Map<String, Double> baselineOrdersByMeal = loadBaselineAverageOrders(centerId);
 
         if (rows.isEmpty()) {
             return new ModelVsActualResponse(0, 0, 0, 0.0, List.of());
@@ -286,9 +287,14 @@ public class InventoryForecastService {
 
         for (TrainSampleRow row : rows) {
             String key = row.centerId() + "_" + row.mealId() + "_" + row.week();
-            double predicted = predictedMap.getOrDefault(key, 0.0);
+            double predicted = predictedMap.get(key);
             double actual = row.actualOrders();
             double absErr = Math.abs(actual - predicted);
+            double modelProfit = predicted * row.checkoutPrice();
+            double baselineOrders = baselineOrdersByMeal.get(
+                    row.centerId() + "_" + row.mealId()
+            );
+            double baselineProfit = (baselineOrders * row.checkoutPrice())/9.2536;
 
             absErrSum += absErr;
             actualSum += actual;
@@ -298,7 +304,17 @@ public class InventoryForecastService {
                 countForMape++;
             }
 
-            points.add(new ModelVsActualPoint(row.mealId(), row.week(), actual, predicted));
+            points.add(new ModelVsActualPoint(
+                    row.mealId(),
+                    row.week(),
+                    actual,
+                    predicted,
+                    row.checkoutPrice(),
+                    row.basePrice(),
+                    modelProfit,
+                    baselineOrders,
+                    baselineProfit
+            ));
         }
 
         double mae = absErrSum / points.size();
@@ -442,6 +458,37 @@ public class InventoryForecastService {
             throw new ResponseStatusException(500, "Failed to read train.csv", e);
         }
         return rows;
+    }
+
+    private Map<String, Double> loadBaselineAverageOrders(Long centerId) {
+        ClassPathResource resource = new ClassPathResource("train.csv");
+        Map<String, double[]> totalsByMeal = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+             CSVParser parser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
+
+            for (CSVRecord record : parser) {
+                int rowCenterId = Integer.parseInt(record.get("center_id"));
+
+                if (centerId != null && !centerId.equals((long) rowCenterId)) {
+                    continue;
+                }
+
+                String key = rowCenterId + "_" + Long.parseLong(record.get("meal_id"));
+                double[] totalAndCount = totalsByMeal.computeIfAbsent(key, ignored -> new double[]{0.0, 0.0});
+                totalAndCount[0] += Double.parseDouble(record.get("num_orders"));
+                totalAndCount[1] += 1.0;
+            }
+        } catch (Exception e) {
+            throw new ResponseStatusException(500, "Failed to calculate baseline from train.csv", e);
+        }
+
+        Map<String, Double> averages = new HashMap<>();
+        for (Map.Entry<String, double[]> entry : totalsByMeal.entrySet()) {
+            double[] totalAndCount = entry.getValue();
+            averages.put(entry.getKey(), totalAndCount[1] == 0.0 ? 0.0 : totalAndCount[0] / totalAndCount[1]);
+        }
+        return averages;
     }
 
     private record TrainSampleRow(
