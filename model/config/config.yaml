@@ -6,7 +6,7 @@ artifacts:
   test_data_path: artifacts/data/test.csv
   train_model_file_path: artifacts/models/model.pkl
   preprocessor_file_path: artifacts/models/preprocessor.pkl
-  model_dir: mlruns/1/models/m-6eab7044b2d6417a8461309573bdb56a/artifacts
+  model_dir: artifacts/model.pkl
   model_name: model.pkl
   
   transformed_data_path: "artifacts/transformed_data.pkl"

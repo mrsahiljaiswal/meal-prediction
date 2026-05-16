@@ -81,12 +81,20 @@ model/log/
 
 # ML specific
 model/mlruns/
+<<<<<<< HEAD
 # model/artifacts/models/*
 # !model/artifacts/models/.gitkeep
 # model/artifacts/test.csv
 # model/artifacts/data/test.csv
 # model/artifacts/data/historical_data/latest_data.csv
 model/artifacts/transformed_data.pkl
+=======
+model/artifacts/models/*
+!model/artifacts/models/.gitkeep
+model/artifacts/test.csv
+model/artifacts/data/test.csv
+model/artifacts/data/historical_data/latest_data.csv
+>>>>>>> f793131
 
 # System
 Thumbs.db

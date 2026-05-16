@@ -211,7 +211,7 @@ __marimo__/
 catboost_info
 
 # artifacts
-# /artifacts
+/artifacts
 
 # mlflow
 /mlruns
