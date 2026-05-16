@@ -81,11 +81,11 @@ model/log/
 
 # ML specific
 model/mlruns/
-model/artifacts/models/*
-!model/artifacts/models/.gitkeep
-model/artifacts/test.csv
-model/artifacts/data/test.csv
-model/artifacts/data/historical_data/latest_data.csv
+# model/artifacts/models/*
+# !model/artifacts/models/.gitkeep
+# model/artifacts/test.csv
+# model/artifacts/data/test.csv
+# model/artifacts/data/historical_data/latest_data.csv
 
 # System
 Thumbs.db
