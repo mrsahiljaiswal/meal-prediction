@@ -4,24 +4,57 @@ import { fetchMeals, placeOrder } from "../api";
 const fallbackImage =
   "https://images.unsplash.com/photo-1495474472205-16284eb8703e?w=600&q=80";
 
+const mealImageMap = {
+  "Vegetarian Thali":
+    "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg",
+
+  "Veggie Rice Bowl":
+    "https://images.pexels.com/photos/723198/pexels-photo-723198.jpeg",
+
+  "Paneer Curry Veg":
+    "https://images.pexels.com/photos/5410400/pexels-photo-5410400.jpeg",
+
+  "Mixed Vegetable Curry":
+    "https://images.pexels.com/photos/7625056/pexels-photo-7625056.jpeg",
+
+  "Mushroom Masala":
+    "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg",
+
+  "Spinach Dal Fry":
+    "https://images.pexels.com/photos/674574/pexels-photo-674574.jpeg",
+
+  "Paneer Tikka":
+    "https://images.pexels.com/photos/9609844/pexels-photo-9609844.jpeg",
+
+    "Chana Masala":
+    "https://images.pexels.com/photos/5560765/pexels-photo-5560765.jpeg",
+  
+  "Kadai Vegetable":
+  "https://images.pexels.com/photos/5410418/pexels-photo-5410418.jpeg",
+  
+  "Dal Makhani":
+  "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg",
+  
+  "Jeera Rice":
+  "https://images.pexels.com/photos/4187620/pexels-photo-4187620.jpeg",
+  
+  "Aloo Gobi":
+  "https://images.pexels.com/photos/4198019/pexels-photo-4198019.jpeg",
+  
+  "Matar Paneer":
+  "https://images.pexels.com/photos/5410401/pexels-photo-5410401.jpeg",
+  
+  "Veg Noodles":
+  "https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg",
+  
+  "Masala Dosa":
+  "https://images.pexels.com/photos/5560763/pexels-photo-5560763.jpeg"
+};
+
 const getImageForMeal = (mealName) => {
   if (!mealName) return fallbackImage;
-  const name = mealName.toLowerCase();
-  if (name.includes("beverage") || name.includes("coffee") || name.includes("tea"))
-    return "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=600&q=80";
-  if (name.includes("sandwich"))
-    return "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&q=80";
-  if (name.includes("dessert") || name.includes("sweet") || name.includes("brownie"))
-    return "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=600&q=80";
-  if (name.includes("salad"))
-    return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80";
-  if (name.includes("pizza"))
-    return "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80";
-  if (name.includes("pasta"))
-    return "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&q=80";
-  if (name.includes("rice") || name.includes("biryani"))
-    return "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&q=80";
-  return fallbackImage;
+  const name = mealName;
+  return mealImageMap[name];
 };
 
 const getMealImageUrl = (meal) =>
