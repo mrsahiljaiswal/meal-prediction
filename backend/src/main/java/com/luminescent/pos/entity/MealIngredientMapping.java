@@ -50,7 +50,7 @@ public class MealIngredientMapping {
         this.ingredient = ingredient;
     }
 
-    public Double getQuantityRequired() {
+    public double getQuantityRequired() {
         return quantityRequired;
     }
 
