@@ -61,6 +61,7 @@ class ModelTrainer:
         logging.info(f"Best Model Found. Params: {rs.best_params_}")
 
         # Predictions for evaluation
+        logging.info(f"X_test: {X_test.shape}")
         test_pred = best_model.predict(X_test)
         metrics = calculate_regression_metrics(y_test, test_pred, is_log_transformed=True)
         

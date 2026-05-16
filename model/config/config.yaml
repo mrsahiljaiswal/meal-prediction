@@ -8,18 +8,28 @@ artifacts:
   preprocessor_file_path: artifacts/models/preprocessor.pkl
   model_dir: mlruns/1/models/m-6eab7044b2d6417a8461309573bdb56a/artifacts
   model_name: model.pkl
+  
+  transformed_data_path: "artifacts/transformed_data.pkl"
 
 data:
-  raw_data_path: artifacts/test.csv
+  raw_data_path: data/raw/data.csv
   split_week: 130
   test_size: 0.2
   random_state: 42
+  target_column: num_orders
+  # split from which week
+  # You might want to define which features to drop if any
+  drop_columns: ["id"] 
 
 model:
   selected_model: lightgbm
+   # RandomizedSearch settings
   n_iter: 5
-  cv: 5
   random_state: 42
+
+  # selected_model: "xgboost"
+  # selected_model: "catboost"
+  cv: 5
 
 param_grids:
   lgb:
@@ -47,3 +57,15 @@ mlflow:
   run_name: default_run
   tracking_uri: mlruns
   backend_store_uri: file:mlruns
+  tags:
+    data_set: "v1.0"
+
+
+ 
+
+
+  
+
+
+  
+  
