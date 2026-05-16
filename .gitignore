@@ -86,6 +86,7 @@ model/mlruns/
 # model/artifacts/test.csv
 # model/artifacts/data/test.csv
 # model/artifacts/data/historical_data/latest_data.csv
+model/artifacts/transformed_data.pkl
 
 # System
 Thumbs.db
