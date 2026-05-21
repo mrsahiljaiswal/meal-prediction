@@ -5,7 +5,8 @@ pool:
   name: Prince
   
 variables:
-  - group: CafeOpsVariables  # replace with your Azure variable group name
+  - group: CafeOpsVariables 
+  - group: Docker
 
 steps:
 
