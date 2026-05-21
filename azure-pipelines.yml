@@ -10,6 +10,9 @@ steps:
 # CHECKOUT SOURCE
 # =========================
 - checkout: self
+  
+variables:
+  - group: CafeOpsVariables  # replace with your Azure variable group name
 
 # =========================
 # CHECK REQUIRED TOOLS
@@ -153,6 +156,10 @@ steps:
     echo "Building Backend Docker Image..."
 
     docker build \
+      --build-arg SPRING_DATASOURCE_URL="${SPRING_DATASOURCE_URL}" \
+      --build-arg SPRING_DATASOURCE_USERNAME="${SPRING_DATASOURCE_USERNAME}" \
+      --build-arg SPRING_DATASOURCE_PASSWORD="${SPRING_DATASOURCE_PASSWORD}" \
+      --build-arg ML_SERVICE_URL="${ML_SERVICE_URL}" \
       -t $(DOCKER_USERNAME)/cafeops-backend:latest \
       ./backend
   displayName: "Build Backend Image"
@@ -164,6 +171,7 @@ steps:
     echo "Building ML Docker Image..."
 
     docker build \
+      --build-arg PORT="${ML_SERVICE_PORT}" \
       -t $(DOCKER_USERNAME)/cafeops-ml:latest \
       ./model
   displayName: "Build ML Image"
@@ -175,6 +183,7 @@ steps:
     echo "Building Frontend Docker Image..."
 
     docker build \
+      --build-arg VITE_API_URL="${VITE_API_URL}" \
       -t $(DOCKER_USERNAME)/cafeops-frontend:latest \
       ./frontend
   displayName: "Build Frontend Image"
@@ -217,7 +226,7 @@ steps:
 - script: |
     echo "Checking ML Service..."
 
-    curl --fail http://localhost:5001/predict || exit 1
+    curl --fail http://localhost:5001/health || exit 1
   displayName: "ML Health Check"
 
 # =========================

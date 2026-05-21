@@ -1,13 +1,9 @@
-Flask
+flask
 pandas
 numpy
 scikit-learn
-xgboost
-catboost
-lightgbm
-mlflow
+joblib
+gunicorn
 dill
-PyYAML
-seaborn
-setuptools
+pyyaml
 -e .

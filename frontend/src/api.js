@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8082";
+
 const api = axios.create({
-  baseURL: "http://localhost:8082",
+  baseURL: API_BASE_URL,
 });
 
 // export const placeOrder = (payload) => api.post("/api/orders", payload);
@@ -12,7 +14,7 @@ export const fetchModelVsActual = (limit = 40, centerId) =>
 export const fetchModelMetrics = () => api.get("/api/inventory/model-metrics");
 export const fetchBaselineSales = (centerId) =>
   api.get(`/api/inventory/baseline-sales/${centerId}`);
-const BASE_URL = "http://localhost:8082/api";
+const BASE_URL = `${API_BASE_URL}/api`;
 // Fetch inventory dynamically for the logged-in center
 export const fetchInventory = async (centerId) => {
   const response = await fetch(`${BASE_URL}/inventory/center/${centerId}`);

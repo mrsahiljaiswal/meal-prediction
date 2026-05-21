@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "*") // Allows React to connect
 public class OrderController {
 
     @Autowired
