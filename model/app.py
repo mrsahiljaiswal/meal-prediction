@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import datetime
 sys.path.insert(0, os.path.abspath('.'))
 from src.pipelines.predict_pipeline import PredictionPipeline
 from src.components.data_transformation import DataTransformation
@@ -12,6 +13,7 @@ from src.decorators import handle_exception
 
 app = Flask(__name__)
 config = load_yaml('config/config.yaml')
+port = int(os.getenv('PORT', 5001))
 # Initialize the pipeline once when the server starts
 try:
     pipeline = PredictionPipeline()
@@ -255,6 +257,24 @@ def get_baseline_sales(center_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({
+        'status': 'UP',
+        'service': 'ML Service',
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200
+
+@app.route('/health/live', methods=['GET'])
+def liveness():
+    return jsonify({'status': 'UP'}), 200
+
+@app.route('/health/ready', methods=['GET'])
+def readiness():
+    # Add model loading check if needed
+    return jsonify({'status': 'READY'}), 200
+
+
 if __name__ == "__main__":
     # In production, use a WSGI server like Gunicorn
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)

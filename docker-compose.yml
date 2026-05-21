@@ -7,9 +7,9 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: cafeOps
-      POSTGRES_USER: prince
-      POSTGRES_PASSWORD: 1234567890
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     ports:
       - "5432:5432"
@@ -17,6 +17,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -27,15 +33,26 @@ services:
     restart: unless-stopped
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cafeOps
-      SPRING_DATASOURCE_USERNAME: prince
-      SPRING_DATASOURCE_PASSWORD: 1234567890
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      ML_SERVICE_URL: ${ML_SERVICE_URL}
 
     ports:
       - "8082:8082"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   ml:
     build:
@@ -45,8 +62,18 @@ services:
     container_name: ml_service
     restart: unless-stopped
 
+    environment:
+      PORT: ${ML_SERVICE_PORT}
+      FLASK_ENV: production
+
     ports:
       - "5001:5001"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build:
@@ -58,6 +85,9 @@ services:
 
     depends_on:
       - backend
+
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
 
     ports:
       - "5173:5173"

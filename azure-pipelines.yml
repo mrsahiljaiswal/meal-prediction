@@ -138,31 +138,60 @@ steps:
   displayName: "Frontend Security Audit"
 
 # =========================
-# DOCKER COMPOSE BUILD
+# DOCKER LOGIN
 # =========================
 - script: |
-    echo "Building Docker Containers..."
+    echo "Logging into Docker Hub..."
 
-    docker compose build
-  displayName: "Docker Compose Build"
-
-# =========================
-# STOP OLD CONTAINERS
-# =========================
-- script: |
-    echo "Stopping Old Containers..."
-
-    docker compose down --remove-orphans
-  displayName: "Stop Old Containers"
+    echo "$(DOCKER_PASSWORD)" | docker login -u "$(DOCKER_USERNAME)" --password-stdin
+  displayName: "Docker Login"
 
 # =========================
-# START CONTAINERS
+# BUILD BACKEND IMAGE
 # =========================
 - script: |
-    echo "Starting Containers..."
+    echo "Building Backend Docker Image..."
 
-    docker compose up --build -d
-  displayName: "Start Containers"
+    docker build \
+      -t $(DOCKER_USERNAME)/cafeops-backend:latest \
+      ./backend
+  displayName: "Build Backend Image"
+
+# =========================
+# BUILD ML IMAGE
+# =========================
+- script: |
+    echo "Building ML Docker Image..."
+
+    docker build \
+      -t $(DOCKER_USERNAME)/cafeops-ml:latest \
+      ./model
+  displayName: "Build ML Image"
+
+# =========================
+# BUILD FRONTEND IMAGE
+# =========================
+- script: |
+    echo "Building Frontend Docker Image..."
+
+    docker build \
+      -t $(DOCKER_USERNAME)/cafeops-frontend:latest \
+      ./frontend
+  displayName: "Build Frontend Image"
+
+# =========================
+# PUSH DOCKER IMAGES
+# =========================
+- script: |
+    echo "Pushing Backend Image..."
+    docker push $(DOCKER_USERNAME)/cafeops-backend:latest
+
+    echo "Pushing ML Image..."
+    docker push $(DOCKER_USERNAME)/cafeops-ml:latest
+
+    echo "Pushing Frontend Image..."
+    docker push $(DOCKER_USERNAME)/cafeops-frontend:latest
+  displayName: "Push Docker Images"
 
 # =========================
 # WAIT FOR SERVICES
