@@ -1,0 +1,237 @@
+trigger:
+- main
+
+pool:
+  name: Prince
+
+steps:
+
+# =========================
+# CHECKOUT SOURCE
+# =========================
+- checkout: self
+
+# =========================
+# CHECK REQUIRED TOOLS
+# =========================
+- script: |
+    echo "Checking installed tools..."
+
+    which java
+    which mvn
+    which docker
+    which docker-compose || true
+    which python3
+    which npm
+    which curl
+
+    echo "----------------------"
+
+    java --version
+    mvn -v
+    docker -v
+    python3 --version
+    npm -v
+    curl --version
+  displayName: "Check Tools"
+
+# =========================
+# PREPARE SONARQUBE
+# =========================
+- task: SonarQubePrepare@7
+  inputs:
+    SonarQube: 'sonar'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: 'Cafe-Ops_Cafe-Ops_AZ5EM3Id1aMuKrHO_90V'
+    cliProjectName: 'Cafe-Ops'
+    cliSources: '.'
+    extraProperties: |
+      sonar.projectName=Cafe-Ops
+      sonar.projectKey=Cafe-Ops_Cafe-Ops_AZ5EM3Id1aMuKrHO_90V
+
+      # Backend Java Classes
+      sonar.java.binaries=backend/target/classes
+
+      # Exclusions
+      sonar.exclusions=**/node_modules/**,**/venv/**,**/.venv/**,**/dist/**,**/build/**
+
+  displayName: "Prepare SonarQube"
+
+# =========================
+# BACKEND BUILD
+# =========================
+- script: |
+    echo "Building Spring Boot Backend..."
+
+    cd backend
+
+    mvn clean package -DskipTests
+  displayName: "Backend Build"
+
+# =========================
+# ML SERVICE SETUP
+# =========================
+- script: |
+    echo "Setting up ML Service..."
+
+    cd model
+
+    python3 -m venv venv
+
+    . venv/bin/activate
+
+    pip install --upgrade pip
+
+    pip install -r requirements.txt
+  displayName: "ML Service Setup"
+
+# =========================
+# FRONTEND INSTALL + BUILD
+# =========================
+- script: |
+    echo "Installing Frontend Dependencies..."
+
+    cd frontend
+
+    npm install
+
+    echo "Building Frontend..."
+
+    npm run build
+  displayName: "Frontend Install & Build"
+
+# =========================
+# RUN SONARQUBE ANALYSIS
+# =========================
+- task: SonarQubeAnalyze@7
+  displayName: "Run SonarQube Analysis"
+
+# =========================
+# PUBLISH QUALITY GATE
+# =========================
+- task: SonarQubePublish@7
+  inputs:
+    pollingTimeoutSec: '300'
+  displayName: "Publish Quality Gate"
+
+# =========================
+# OWASP DEPENDENCY CHECK
+# =========================
+- script: |
+    echo "Running OWASP Dependency Check..."
+
+    cd backend
+
+    mvn org.owasp:dependency-check-maven:check
+  displayName: "OWASP Dependency Check"
+
+# =========================
+# FRONTEND SECURITY AUDIT
+# =========================
+- script: |
+    echo "Running npm audit..."
+
+    cd frontend
+
+    npm audit --audit-level=high
+  displayName: "Frontend Security Audit"
+
+# =========================
+# DOCKER COMPOSE BUILD
+# =========================
+- script: |
+    echo "Building Docker Containers..."
+
+    docker compose build
+  displayName: "Docker Compose Build"
+
+# =========================
+# STOP OLD CONTAINERS
+# =========================
+- script: |
+    echo "Stopping Old Containers..."
+
+    docker compose down --remove-orphans
+  displayName: "Stop Old Containers"
+
+# =========================
+# START CONTAINERS
+# =========================
+- script: |
+    echo "Starting Containers..."
+
+    docker compose up --build -d
+  displayName: "Start Containers"
+
+# =========================
+# WAIT FOR SERVICES
+# =========================
+- script: |
+    echo "Waiting for services to initialize..."
+
+    sleep 40
+  displayName: "Wait For Services"
+
+# =========================
+# BACKEND HEALTH CHECK
+# =========================
+- script: |
+    echo "Checking Spring Boot Backend..."
+
+    curl --fail http://localhost:8082 || exit 1
+  displayName: "Backend Health Check"
+
+# =========================
+# ML SERVICE HEALTH CHECK
+# =========================
+- script: |
+    echo "Checking ML Service..."
+
+    curl --fail http://localhost:5001/predict || exit 1
+  displayName: "ML Health Check"
+
+# =========================
+# FRONTEND HEALTH CHECK
+# =========================
+- script: |
+    echo "Checking Frontend..."
+
+    curl --fail http://localhost:5173 || exit 1
+  displayName: "Frontend Health Check"
+
+# =========================
+# SHOW RUNNING CONTAINERS
+# =========================
+- script: |
+    echo "Running Containers..."
+
+    docker ps
+  displayName: "Show Running Containers"
+
+# =========================
+# SHOW CONTAINER LOGS
+# =========================
+- script: |
+    echo "Backend Logs:"
+    docker logs spring_backend --tail 20 || true
+
+    echo "----------------------"
+
+    echo "ML Logs:"
+    docker logs ml_service --tail 20 || true
+
+    echo "----------------------"
+
+    echo "Frontend Logs:"
+    docker logs react_frontend --tail 20 || true
+  displayName: "Container Logs"
+
+# =========================
+# POST ACTIONS
+# =========================
+- script: |
+    echo "=================================="
+    echo "Pipeline completed successfully."
+    echo "=================================="
+  displayName: "Post Actions"
